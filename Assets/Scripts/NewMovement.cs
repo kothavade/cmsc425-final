@@ -1,27 +1,35 @@
 using UnityEngine;
 
+[RequireComponent(typeof(PlayerStats))] // Require the PlayerStats component
 public class NewMovement : MonoBehaviour
 {
     // Reference to orientation transform (for camera-relative movement)
     [SerializeField] Transform orientation;
     
     [Header("Movement")]
-    [SerializeField] float moveSpeed = 6f;       // Base movement speed
+    [SerializeField] float baseMoveSpeed = 6f;   // Base movement speed
     [SerializeField] float moveMultiplier = 10f; // Multiplier applied to movement force
     [SerializeField] float airMultiplier = .8f;  // Reduced movement control in air
     [SerializeField] float groundDrag = 6f;      // Higher drag when on ground
     [SerializeField] float airDrag = 2f;         // Lower drag when in air
     [SerializeField] float bHopWindow = 4f;      // Time window for bunny hopping
-    [SerializeField] float jumpForce = 15f;      // Force applied when jumping
+    [SerializeField] float baseJumpForce = 30f;      // Force applied when jumping
+
     [SerializeField] bool easyBHop = false;
     private bool jumping = false;
     private bool jumpKeyHeld = false;
     float timeOnGround = 0f;                     // Tracks time spent on ground for bunny hopping
     
+    // Reference to the PlayerStats component
+    private PlayerStats playerStats;
+    
+    // Current effective move speed (will be updated with player stats)
+    private float currentMoveSpeed;
+    private float currentJumpForce;
+    
     [Header("keybinds")]
     [SerializeField] KeyCode jumpKey = KeyCode.Space;  // Key used for jumping
     
-
     [Header("Ground Detection")]
     [SerializeField] LayerMask groundMask;       // Layers that count as ground
     [SerializeField] Transform groundCheck;      // Position to check for ground
@@ -29,7 +37,7 @@ public class NewMovement : MonoBehaviour
     
     bool isGrounded;                            // Current grounded state
 
-    public float gravityForce = -.4f;           // Custom gravity value
+    public float gravityForce = -70f;           // Custom gravity value
     
     Rigidbody rb;                               // Reference to player's rigidbody
     RaycastHit slopeHit;                        // Stores information about slope raycast
@@ -64,13 +72,25 @@ public class NewMovement : MonoBehaviour
         // Get and configure the rigidbody
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;  // Prevent physics from rotating the player
+        
+        // Get reference to PlayerStats component
+        playerStats = GetComponent<PlayerStats>();
+        
+        // Initialize current move speed with base value if PlayerStats is not found
+        if (playerStats == null)
+        {
+            Debug.LogWarning("PlayerStats component not found! Using baseMoveSpeed instead.");
+            currentMoveSpeed = baseMoveSpeed;
+        }
     }
 
     private void Update()
     {
+        // Update current movement speed from player stats
+        UpdateStats();
+        
         // Check if player is on ground
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
-        print(isGrounded);  // Debug output
         
         // Get player input and update drag
         MyInput();
@@ -86,6 +106,24 @@ public class NewMovement : MonoBehaviour
         // Project movement direction onto slope surface
         slopeMoveDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
     }
+    
+    // Updates current move speed from PlayerStats
+    void UpdateStats()
+    {
+        if (playerStats != null)
+        {
+            // Use player stats move speed 
+            currentMoveSpeed = playerStats.moveSpeed;
+            currentJumpForce = playerStats.jumpForce;
+
+        }
+        else
+        {
+            // Fallback to base speed if no PlayerStats exists
+            currentMoveSpeed = baseMoveSpeed;
+            currentJumpForce = baseJumpForce;
+        }
+    }
 
     // Applies jump force
     void Jump() 
@@ -93,7 +131,7 @@ public class NewMovement : MonoBehaviour
         // Reset vertical velocity before jumping
         jumping = true;
         rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
-        rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+        rb.AddForce(transform.up * currentJumpForce, ForceMode.Impulse);
     }
 
     // Gets movement input
@@ -135,7 +173,7 @@ public class NewMovement : MonoBehaviour
         {
             // Use slope-adjusted direction
             jumping = false;
-            rb.AddForce(slopeMoveDirection * moveSpeed * moveMultiplier, ForceMode.Acceleration);
+            rb.AddForce(slopeMoveDirection * currentMoveSpeed * moveMultiplier, ForceMode.Acceleration);
         }
         // If on ground but not on slope
         else if (isGrounded)
@@ -146,11 +184,11 @@ public class NewMovement : MonoBehaviour
             
             // If within bunny hop window, maintain some air mobility
             if (timeOnGround < bHopWindow) {
-                rb.AddForce(moveDirection * moveSpeed * moveMultiplier * airMultiplier, ForceMode.Acceleration);
+                rb.AddForce(moveDirection * currentMoveSpeed * moveMultiplier * airMultiplier, ForceMode.Acceleration);
             } 
             else  // Normal ground movement
             {
-                rb.AddForce(moveDirection * moveSpeed * moveMultiplier, ForceMode.Acceleration);
+                rb.AddForce(moveDirection * currentMoveSpeed * moveMultiplier, ForceMode.Acceleration);
             }
         }
         // If in air
@@ -159,11 +197,18 @@ public class NewMovement : MonoBehaviour
             // Reset ground time when airborne
             timeOnGround = 0f;
             
-            // Apply gravity to movement direction
-            moveDirection += new Vector3(0, gravityForce, 0);
-            
             // Apply air movement with reduced control
-            rb.AddForce(moveDirection * moveSpeed * moveMultiplier * airMultiplier, ForceMode.Acceleration);
+            rb.AddForce(moveDirection * currentMoveSpeed * moveMultiplier * airMultiplier, ForceMode.Acceleration);
+            rb.AddForce(Vector3.down + new Vector3(0, gravityForce,0), ForceMode.Acceleration);
         }
+    }
+
+    public void PushImpulse(Vector3 forceVector) 
+    {
+        rb.AddForce(forceVector, ForceMode.Impulse);   
+    }
+    public void PushAccel(Vector3 forceVector) 
+    {
+        rb.AddForce(forceVector, ForceMode.Acceleration);   
     }
 }

@@ -12,7 +12,6 @@ public class MovePlayerBehindCamera : MonoBehaviour
        // Update the camera's position every frame to match the target position
        transform.position = camPosition.position - orientation.forward * positionOffset;
        transform.rotation = orientation.rotation;
-       Debug.Log($"player body position: {transform.position}, orientation postion: {orientation.position}");
    }
 }
 
