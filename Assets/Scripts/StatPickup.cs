@@ -10,17 +10,16 @@ public class StatPickup : MonoBehaviour
     public StatType statToModify;
     public float statChangeAmount = 10f;
     public bool isTemporary = false;
-    public float duration = 10f; // Only used if isTemporary is true
+    public float duration = 10f; 
     
     [Header("Pickup Settings")]
     public bool destroyOnPickup = true;
-    public GameObject pickupEffect; // Optional visual effect
-    public AudioClip pickupSound; // Optional sound effect
+    public GameObject pickupEffect; 
+    public AudioClip pickupSound; 
 
     
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("pickup trigger enter");
         // Check if the object that entered the trigger is the player
         if (other.CompareTag("Player"))
         {

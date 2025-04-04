@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // If you're using TextMeshPro (recommended)
+using TMPro;
 
 public class PlayerUI : MonoBehaviour
 {
@@ -13,10 +13,7 @@ public class PlayerUI : MonoBehaviour
     public TextMeshProUGUI strengthText;
     public TextMeshProUGUI defenseText;
     public TextMeshProUGUI jumpText;
-    
-    // For active boosts display
-    public GameObject speedBoostIndicator;
-    
+
     void Update()
     {
         PlayerStats playerStats = player.GetComponent<PlayerStats>();
