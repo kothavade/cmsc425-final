@@ -13,7 +13,15 @@ public class NewMovement : MonoBehaviour
     [SerializeField] float groundDrag = 6f;      // Higher drag when on ground
     [SerializeField] float airDrag = 2f;         // Lower drag when in air
     [SerializeField] float bHopWindow = 4f;      // Time window for bunny hopping
-    [SerializeField] float baseJumpForce = 30f;      // Force applied when jumping
+    [SerializeField] float baseJumpForce = 30f;  // Force applied when jumping
+
+    [Header("Gravity")]
+    [SerializeField] float initialGravityForce = -70f;  // Initial gravity force
+    [SerializeField] float maxGravityForce = -200f;     // Maximum gravity force
+    [SerializeField] float gravityAcceleration = 20f;   // How quickly gravity increases
+    [SerializeField] float terminalFallVelocity = -40f; // Terminal velocity when falling
+    private float currentGravityForce;                 // Current gravity force being applied
+    private float fallTime = 0f;                       // How long the player has been falling
 
     [SerializeField] bool easyBHop = false;
     private bool jumping = false;
@@ -36,8 +44,6 @@ public class NewMovement : MonoBehaviour
     float groundDistance = 0.4f;                 // Distance to check for ground
     
     bool isGrounded;                            // Current grounded state
-
-    public float gravityForce = -70f;           // Custom gravity value
     
     Rigidbody rb;                               // Reference to player's rigidbody
     RaycastHit slopeHit;                        // Stores information about slope raycast
@@ -82,6 +88,9 @@ public class NewMovement : MonoBehaviour
             Debug.LogWarning("PlayerStats component not found! Using baseMoveSpeed instead.");
             currentMoveSpeed = baseMoveSpeed;
         }
+        
+        // Initialize gravity force
+        currentGravityForce = initialGravityForce;
     }
 
     private void Update()
@@ -105,6 +114,34 @@ public class NewMovement : MonoBehaviour
 
         // Project movement direction onto slope surface
         slopeMoveDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
+        
+        // Handle gravity and falling
+        ManageFalling();
+    }
+    
+    // Manages falling mechanics
+    void ManageFalling()
+    {
+        // Reset fall time and gravity when grounded
+        if (isGrounded)
+        {
+            fallTime = 0f;
+            currentGravityForce = initialGravityForce;
+        }
+        else
+        {
+            // Increase fall time when in air
+            fallTime += Time.deltaTime;
+            
+            // Increase gravity force over time, but cap it at maximum
+            currentGravityForce = Mathf.Max(maxGravityForce, initialGravityForce - (gravityAcceleration * fallTime));
+            
+            // If falling too fast, cap the downward velocity to terminal velocity
+            if (rb.linearVelocity.y < terminalFallVelocity)
+            {
+                rb.linearVelocity = new Vector3(rb.linearVelocity.x, terminalFallVelocity, rb.linearVelocity.z);
+            }
+        }
     }
     
     // Updates current move speed from PlayerStats
@@ -115,7 +152,6 @@ public class NewMovement : MonoBehaviour
             // Use player stats move speed 
             currentMoveSpeed = playerStats.moveSpeed;
             currentJumpForce = playerStats.jumpForce;
-
         }
         else
         {
@@ -199,7 +235,9 @@ public class NewMovement : MonoBehaviour
             
             // Apply air movement with reduced control
             rb.AddForce(moveDirection * currentMoveSpeed * moveMultiplier * airMultiplier, ForceMode.Acceleration);
-            rb.AddForce(Vector3.down + new Vector3(0, gravityForce,0), ForceMode.Acceleration);
+            
+            // Apply progressively stronger gravity
+            rb.AddForce(new Vector3(0, currentGravityForce, 0), ForceMode.Acceleration);
         }
     }
 
@@ -207,6 +245,7 @@ public class NewMovement : MonoBehaviour
     {
         rb.AddForce(forceVector, ForceMode.Impulse);   
     }
+    
     public void PushAccel(Vector3 forceVector) 
     {
         rb.AddForce(forceVector, ForceMode.Acceleration);   
