@@ -11,15 +11,30 @@ public class PlayerStats : MonoBehaviour
     public float strength = 10f;
     public float defense = 5f;
     public float jumpForce = 30f;
-    
+
     [Header("Temporary Boosts")]
-    private Dictionary<string, Coroutine> activeBoosts = new Dictionary<string, Coroutine>();
-    
+    private Dictionary<string, Coroutine> activeBoosts = new();
+
     private void Start()
     {
         currentHealth = maxHealth;
     }
-    
+
+    public void TakeDamage(float damage)
+    {
+        float effectiveDamage = damage - defense;
+        effectiveDamage = Mathf.Max(0, effectiveDamage);
+        currentHealth -= effectiveDamage;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+
+        Debug.Log($"Took {effectiveDamage} damage. Current health: {currentHealth}");
+
+        if (currentHealth <= 0)
+        {
+            Debug.Log("Player is dead!");
+        }
+    }
+
     #region Permanent Stat Modifications
     public void ModifyMaxHealth(float amount)
     {
@@ -27,35 +42,35 @@ public class PlayerStats : MonoBehaviour
         maxHealth = Mathf.Max(1, maxHealth);
         Debug.Log($"Max Health changed by {amount}. Max health: {maxHealth}");
     }
-    
+
     public void ModifyCurrentHealth(float amount)
     {
         currentHealth += amount;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         Debug.Log($"Current Health changed by {amount}. Current Health: {currentHealth}");
     }
-    
+
     public void ModifySpeed(float amount)
     {
         moveSpeed += amount;
         moveSpeed = Mathf.Max(0.1f, moveSpeed); // Ensure speed doesn't go below 0.1
         Debug.Log($"Speed changed by {amount}. Current speed: {moveSpeed}");
     }
-    
+
     public void ModifyStrength(float amount)
     {
         strength += amount;
         strength = Mathf.Max(0, strength);
         Debug.Log($"Strength changed by {amount}. Current strength: {strength}");
     }
-    
+
     public void ModifyDefense(float amount)
     {
         defense += amount;
         defense = Mathf.Max(0, defense);
         Debug.Log($"Defense changed by {amount}. Current defense: {defense}");
     }
-    
+
     public void ModifyJump(float amount)
     {
         jumpForce += amount;
@@ -64,36 +79,36 @@ public class PlayerStats : MonoBehaviour
 
     }
     #endregion
-    
+
     #region Temporary Stat Boosts
-    
+
     public void ApplyTemporaryHealthBoost(float amount, float duration)
     {
         // Stop any active health boost
         StopBoostIfActive("health");
-        
+
         // Start a new health boost
         activeBoosts["health"] = StartCoroutine(TemporaryStatBoost("health", amount, duration));
     }
-    
+
     public void ApplyTemporarySpeedBoost(float amount, float duration)
     {
         StopBoostIfActive("speed");
         activeBoosts["speed"] = StartCoroutine(TemporaryStatBoost("speed", amount, duration));
     }
-    
+
     public void ApplyTemporaryStrengthBoost(float amount, float duration)
     {
         StopBoostIfActive("strength");
         activeBoosts["strength"] = StartCoroutine(TemporaryStatBoost("strength", amount, duration));
     }
-    
+
     public void ApplyTemporaryDefenseBoost(float amount, float duration)
     {
         StopBoostIfActive("defense");
         activeBoosts["defense"] = StartCoroutine(TemporaryStatBoost("defense", amount, duration));
     }
-    
+
     public void ApplyTemporaryJumpBoost(float amount, float duration)
     {
         StopBoostIfActive("jump");
@@ -108,7 +123,7 @@ public class PlayerStats : MonoBehaviour
             activeBoosts[statName] = null;
         }
     }
-    
+
     private IEnumerator TemporaryStatBoost(string statName, float amount, float duration)
     {
         // Apply the boost
@@ -135,10 +150,10 @@ public class PlayerStats : MonoBehaviour
                 Debug.Log($"Applied temporary jump boost of {amount} for {duration} seconds");
                 break;
         }
-        
+
         // Wait for the duration
         yield return new WaitForSeconds(duration);
-        
+
         // Remove the boost
         switch (statName)
         {
@@ -163,9 +178,9 @@ public class PlayerStats : MonoBehaviour
                 break;
 
         }
-        
+
         activeBoosts[statName] = null;
     }
-    
+
     #endregion
 }
