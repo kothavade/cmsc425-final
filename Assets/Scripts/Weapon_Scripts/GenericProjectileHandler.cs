@@ -43,7 +43,5 @@ public class GenericProjectileHandler : MonoBehaviour
             SourceWeapon.onHit(enemy_hp);
             GameObjectPoolManager.Deactivate(gameObject);
         }
-        
-        
     }
 }
