@@ -6,7 +6,8 @@ public class GenericProjectileHandler : MonoBehaviour
     Rigidbody rb;
     public float projectile_speed;
     public float max_lifetime;
-    public int damage;
+    public float damage;
+    public bool hitOnExpire = false;
     public AmmoTracker SourceWeapon;
     private float lifetime;
 
@@ -25,6 +26,9 @@ public class GenericProjectileHandler : MonoBehaviour
         lifetime = lifetime - Time.deltaTime;
         if(lifetime <= 0f){
             lifetime = max_lifetime;
+            if(hitOnExpire) {
+                SourceWeapon.onHit(gameObject.transform.position);
+            }
             GameObjectPoolManager.Deactivate(gameObject);
         }
     }
@@ -34,13 +38,14 @@ public class GenericProjectileHandler : MonoBehaviour
     }
 
     void OnCollisionEnter(Collision col){
-        int enemy_hp = -2;
+        SourceWeapon.onHit(gameObject.transform.position);
+        float enemy_hp = -2;
         Enemy enemy = col.gameObject.GetComponent<Enemy>();
         if (enemy != null) {
             enemy_hp = enemy.TakeDamage(damage);
             print(gameObject.name + " hit " + enemy.name + " for " + enemy_hp +" health left!");
         }
-        SourceWeapon.onHit(enemy_hp);
+        SourceWeapon.onEnemyHit(enemy_hp);
         GameObjectPoolManager.Deactivate(gameObject);
     }
 }

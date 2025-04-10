@@ -10,8 +10,8 @@ public class Enemy : MonoBehaviour
     public float attackRange = 2f;
     public float bufferRange = 0.5f;
     public float attackCooldown = 2f;
-    public int max_health = 5;
-    public int health;
+    public float max_health = 5;
+    public float health;
     bool dead = false;
 
     float nextAttackTime = 0f;
@@ -53,15 +53,15 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    public int TakeDamage(int dmg){
+    public float TakeDamage(float dmg){
         print("Enemy took DMG:" + dmg);
         health -= dmg;
-        if (health < 1 && !dead) {
+        if (health <= 0 && !dead) {
             dead = true;
             GameObjectPoolManager.Deactivate(gameObject);
             return -1;
         }
-        return Mathf.Max(health, 0);
+        return Mathf.Max(health, 0f);
     }
 
     void AttemptAttack()

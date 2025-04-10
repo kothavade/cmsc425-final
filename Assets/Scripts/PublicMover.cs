@@ -5,12 +5,13 @@ using UnityEngine;
 public class PublicMover : MonoBehaviour
 {
 
-    Rigidbody rb;                               // Reference to player's rigidbody
-    public NewMovement nm;                      // Reference to player's NewMovement for grounded check
+    Rigidbody rb;                               // Reference to rigidbody
+    private NewMovement nm;                      // Reference to player's NewMovement for grounded check
 
     void Start()
     {
         // Get and configure the rigidbody
+        nm = GameObject.Find("Player").GetComponent<NewMovement>();
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;  // Prevent physics from rotating the player
     }

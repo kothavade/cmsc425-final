@@ -5,14 +5,20 @@ public class AmmoTracker : MonoBehaviour
 
     public int max_ammo;
     private int curr_ammo;
-    public delegate void OnHitEffect(int dmg);
+    public delegate void OnEnemyHitEffect(float dmg);
+    public OnEnemyHitEffect onEnemyHitEffect;
+    public delegate void OnHitEffect(Vector3 pos);
     public OnHitEffect onHitEffect;
     void Start(){
         curr_ammo = max_ammo;
     }
 
-    public void onHit(int x) {
-        onHitEffect(x);
+    public void onEnemyHit(float x) {
+        onEnemyHitEffect(x);
+    }
+
+    public void onHit(Vector3 pos) {
+        onHitEffect(pos);
     }
 
     public int getAmmo(){

@@ -17,7 +17,8 @@ public class ShotgunHandler : MonoBehaviour
         Weapon = GameObject.Find("Shotgun").GetComponent<AmmoTracker>();
         // ShotgunPellet = GameObject.Find("ShotgunPellet");
         ProjectileSpawner = GameObject.Find("ShotgunProjectileSpawner").transform;
-        Weapon.onHitEffect = (int a) => {if (a == -1) { Weapon.reload(1); }};
+        Weapon.onEnemyHitEffect = (float a) => {if (a == -1f) { Weapon.reload(1); }};
+        Weapon.onHitEffect = (Vector3 pos) => {};
     }
 
     // Update is called once per frame
