@@ -35,7 +35,7 @@ public class Spawner : MonoBehaviour
         Vector3 spawnPosition;
 
         spawnPosition = spawnPoint != null ? spawnPoint.position : transform.position;
-        spawnedObject = Instantiate(prefab, spawnPosition, Quaternion.identity);
+        spawnedObject = GameObjectPoolManager.SpawnObject(prefab, spawnPosition, Quaternion.identity);
     }
 
 }

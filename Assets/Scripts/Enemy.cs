@@ -10,12 +10,21 @@ public class Enemy : MonoBehaviour
     public float attackRange = 2f;
     public float bufferRange = 0.5f;
     public float attackCooldown = 2f;
+    public int max_health = 5;
+    public int health;
+    bool dead = false;
 
     float nextAttackTime = 0f;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+    }
+
+    void OnEnable(){
+        health = max_health;
+        dead = false;
+
     }
 
     void Update()
@@ -42,6 +51,17 @@ public class Enemy : MonoBehaviour
             agent.isStopped = false;
             agent.SetDestination(player.position);
         }
+    }
+
+    public int TakeDamage(int dmg){
+        print("Enemy took DMG:" + dmg);
+        health -= dmg;
+        if (health < 1 && !dead) {
+            dead = true;
+            GameObjectPoolManager.Deactivate(gameObject);
+            return -1;
+        }
+        return Mathf.Max(health, 0);
     }
 
     void AttemptAttack()
