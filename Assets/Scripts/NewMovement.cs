@@ -44,6 +44,9 @@ public class NewMovement : MonoBehaviour
     float groundDistance = 0.4f;                 // Distance to check for ground
     
     bool isGrounded;                            // Current grounded state
+    public bool getIsGrounded(){
+        return isGrounded;
+    }
     
     Rigidbody rb;                               // Reference to player's rigidbody
     RaycastHit slopeHit;                        // Stores information about slope raycast

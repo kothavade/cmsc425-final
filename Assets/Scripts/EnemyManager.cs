@@ -55,7 +55,7 @@ public class EnemyManager : MonoBehaviour
         Vector3 spawnPosition = GetRandomNavmeshPosition();
 
 
-        GameObject enemy = Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
+        GameObject enemy = GameObjectPoolManager.SpawnObject(enemyPrefab, spawnPosition, Quaternion.identity);
         Enemy enemyComponent = enemy.GetComponent<Enemy>();
         if (enemyComponent != null && player != null)
         {
