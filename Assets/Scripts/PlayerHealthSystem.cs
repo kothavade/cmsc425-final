@@ -16,11 +16,6 @@ public class PlayerHealthSystem : MonoBehaviour
     public NewMovement movementScript;  // Reference to the player movement script to disable on death
     public NewCamera cameraScript;      // Reference to the camera control script to disable on death
 
-    // Variables to manage enemy damage timing
-    private float lastEnemyHitTime = -999f; // Time of last damage taken by enemy
-    public float enemyDamageCooldown = 2f;  // Cooldown time (in seconds) between damage ticks
-    public float enemyDamageAmount = 10f;   // Amount of damage the player takes when hit
-
     
     void Start()
     {
@@ -34,8 +29,6 @@ public class PlayerHealthSystem : MonoBehaviour
             return;
         }
 
-        // Initialize health values
-        playerStats.currentHealth = playerStats.maxHealth = 100f;
 
         // Set up the health bar slider if it's assigned
         if (healthBarSlider != null)
@@ -84,55 +77,4 @@ public class PlayerHealthSystem : MonoBehaviour
         }
     }
 
-    // Called when the player enters a trigger collider
-    private void OnTriggerEnter(Collider other)
-    {
-        // Get the parent of the object (used for SpawnPoint checks)
-        Transform parent = other.transform.parent;
-
-        // If it's a Max Health Pickup SpawnPoint
-        if (other.CompareTag("SpawnPoint") && parent != null && parent.name == "Max Health Spawner")
-        {
-            playerStats.ModifyMaxHealth(2f); // Increase max health by 2
-            Debug.Log($"+2 Max Health! Max: {playerStats.maxHealth}, Current: {playerStats.currentHealth}");
-
-            // Update the slider's max value
-            if (healthBarSlider != null)
-            {
-                healthBarSlider.maxValue = playerStats.maxHealth;
-            }
-        }
-
-        // If it's a current health pickup
-        if (other.name.Contains("Current Health Pickup"))
-        {
-            playerStats.ModifyCurrentHealth(5f); // Heal player by 5
-            Debug.Log($"+5 Current Health! Max: {playerStats.maxHealth}, Current: {playerStats.currentHealth}");
-
-            // Remove the pickup from the game
-            Destroy(other.gameObject);
-        }
-
-        // Handle first contact with an enemy
-        TryEnemyDamage(other);
-    }
-
-    // Called while staying inside a trigger collider
-    private void OnTriggerStay(Collider other)
-    {
-        // Keep applying enemy damage at cooldown intervals
-        TryEnemyDamage(other);
-    }
-
-    // Applies damage if the player is touching an enemy and cooldown has passed
-    private void TryEnemyDamage(Collider other)
-    {
-        // Check if the object is tagged "Enemy" and enough time has passed
-        if (other.CompareTag("Enemy") && Time.time - lastEnemyHitTime >= enemyDamageCooldown)
-        {
-            playerStats.TakeDamage(enemyDamageAmount); // Deal damage to player
-            lastEnemyHitTime = Time.time;              // Reset cooldown timer
-            Debug.Log($"Enemy touched player -{enemyDamageAmount} Health");
-        }
-    }
 }

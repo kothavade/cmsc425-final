@@ -46,7 +46,7 @@ public class PlayerStats : MonoBehaviour
     public void ModifyCurrentHealth(float amount)
     {
         currentHealth += amount;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+        currentHealth = Mathf.Max(currentHealth, maxHealth);
         Debug.Log($"Current Health changed by {amount}. Current Health: {currentHealth}");
     }
 
