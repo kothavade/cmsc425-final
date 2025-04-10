@@ -14,6 +14,7 @@ public class Enemy : MonoBehaviour
     public int health;
     bool dead = false;
 
+    public AudioClip damagePlayerSound;
     float nextAttackTime = 0f;
 
     void Start()

@@ -11,6 +11,7 @@ public class PlayerStats : MonoBehaviour
     public float strength = 10f;
     public float defense = 5f;
     public float jumpForce = 30f;
+    public AudioClip takeDamageSound;
 
     [Header("Temporary Boosts")]
     private Dictionary<string, Coroutine> activeBoosts = new();
@@ -28,7 +29,10 @@ public class PlayerStats : MonoBehaviour
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
 
         Debug.Log($"Took {effectiveDamage} damage. Current health: {currentHealth}");
-
+        if (takeDamageSound != null)
+        {
+            AudioSource.PlayClipAtPoint(takeDamageSound, transform.position);
+        }
         if (currentHealth <= 0)
         {
             Debug.Log("Player is dead!");
