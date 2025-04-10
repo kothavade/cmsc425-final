@@ -11,6 +11,7 @@ public class ShotgunHandler : MonoBehaviour
     public float spread;
     public float recoil_intensity;
     private bool hasTouchedGround = false;
+    public AudioClip fireSound; 
 
     void Start(){
         Player = GameObject.Find("Player").GetComponent<PublicMover>();
@@ -51,7 +52,8 @@ public class ShotgunHandler : MonoBehaviour
     // consolidates all functions called upon firing
     void Fire()
     {
-        ApplyRecoil();
+        HandleFireEffects();
+        
         Weapon.fireAmmo(1);
         Debug.Log("Spawning Pellets");
         for ( int i = 0; i < 8; i++)
@@ -66,6 +68,14 @@ public class ShotgunHandler : MonoBehaviour
 
     }
 
+    void HandleFireEffects()
+    {
+        ApplyRecoil();
+        if (fireSound != null)
+        {
+            AudioSource.PlayClipAtPoint(fireSound, transform.position);
+        }
+    }
     // applies the recoil force of the shotgun
     void ApplyRecoil(){
         Player.ApplyImpulse(-transform.parent.forward, recoil_intensity);
