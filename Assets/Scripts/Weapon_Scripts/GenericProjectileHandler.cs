@@ -34,13 +34,16 @@ public class GenericProjectileHandler : MonoBehaviour
     }
 
     void OnCollisionEnter(Collision col){
-        int enemy_hp = -2;
+        
         Enemy enemy = col.gameObject.GetComponent<Enemy>();
         if (enemy != null) {
+            int enemy_hp = -2;
             enemy_hp = enemy.TakeDamage(damage);
             print(gameObject.name + " hit " + enemy.name + " for " + enemy_hp +" health left!");
+            SourceWeapon.onHit(enemy_hp);
+            GameObjectPoolManager.Deactivate(gameObject);
         }
-        SourceWeapon.onHit(enemy_hp);
-        GameObjectPoolManager.Deactivate(gameObject);
+        
+        
     }
 }

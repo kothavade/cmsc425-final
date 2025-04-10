@@ -673,7 +673,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   projectile_speed: 75
   max_lifetime: 3
-  damage: 0
+  damage: 5
   SourceWeapon: {fileID: 1575601346}
 --- !u!135 &1141234798
 SphereCollider:
@@ -1084,7 +1084,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d75b8bf9acf5e1f5696cd2a5c843c3f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  max_ammo: 2
+  max_ammo: 100
 --- !u!114 &1575601347
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1301,11 +1301,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3853780826009517612, guid: e009f7c232c53d14a84c86370ab2dcc8, type: 3}
       propertyPath: sensX
-      value: 7500
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 3853780826009517612, guid: e009f7c232c53d14a84c86370ab2dcc8, type: 3}
       propertyPath: sensY
-      value: 7500
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 3853957839754698706, guid: e009f7c232c53d14a84c86370ab2dcc8, type: 3}
       propertyPath: m_LocalScale.y

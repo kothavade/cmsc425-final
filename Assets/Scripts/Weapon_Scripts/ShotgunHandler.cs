@@ -49,11 +49,18 @@ public class ShotgunHandler : MonoBehaviour
 
 
     // consolidates all functions called upon firing
-    void Fire(){
+    void Fire()
+    {
         ApplyRecoil();
         Weapon.fireAmmo(1);
-        for ( int i = 0; i < 8; i++){
-            GameObjectPoolManager.SpawnObject(ShotgunPellet, ProjectileSpawner.position, ProjectileSpawner.rotation * Quaternion.Euler(Random.Range(-spread, spread),Random.Range(-spread, spread),Random.Range(-spread, spread)));
+        Debug.Log("Spawning Pellets");
+        for ( int i = 0; i < 8; i++)
+        {
+            GameObject pellet = GameObjectPoolManager.SpawnObject(ShotgunPellet, ProjectileSpawner.position, 
+                ProjectileSpawner.rotation * Quaternion.Euler(Random.Range(-spread, spread),
+                Random.Range(-spread, spread), Random.Range(-spread, spread)));
+    
+            Debug.Log($"Pellet {i} spawned: {pellet != null}, Position: {pellet?.transform.position}");
             hasTouchedGround = false;
         }
 
