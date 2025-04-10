@@ -611,6 +611,10 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 92712121}
+    - target: {fileID: 3183873948012795669, guid: e009f7c232c53d14a84c86370ab2dcc8, type: 3}
+      propertyPath: maxHealth
+      value: 50
+      objectReference: {fileID: 0}
     - target: {fileID: 3853957839754698706, guid: e009f7c232c53d14a84c86370ab2dcc8, type: 3}
       propertyPath: m_LocalScale.y
       value: 0.41
