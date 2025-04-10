@@ -674,7 +674,7 @@ MonoBehaviour:
   projectile_speed: 75
   max_lifetime: 3
   damage: 0
-  SourceWeapon: {fileID: 0}
+  SourceWeapon: {fileID: 1575601346}
 --- !u!135 &1141234798
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1450,7 +1450,28 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 502481682211967608, guid: ac56c277de13ca748962deaebbe8660b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2042231444}
+    - targetCorrespondingSourceObject: {fileID: 2079655758028223706, guid: ac56c277de13ca748962deaebbe8660b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5055045649848611409}
   m_SourcePrefab: {fileID: 100100000, guid: ac56c277de13ca748962deaebbe8660b, type: 3}
+--- !u!1 &5055045649848611408 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2079655758028223706, guid: ac56c277de13ca748962deaebbe8660b, type: 3}
+  m_PrefabInstance: {fileID: 5055045649848611407}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5055045649848611409
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5055045649848611408}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a639520d7a6971c4d8b90038d206ae75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerStats: {fileID: 1066825452}
 --- !u!1001 &5907514645040858223
 PrefabInstance:
   m_ObjectHideFlags: 0
