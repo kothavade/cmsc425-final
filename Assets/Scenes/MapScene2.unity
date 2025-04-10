@@ -723,6 +723,10 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 92712121}
+    - target: {fileID: 3099556302658847518, guid: 58451836d01c3a74c8199936cbd9b1ea, type: 3}
+      propertyPath: max_ammo
+      value: 50
+      objectReference: {fileID: 0}
     - target: {fileID: 3807457125737640798, guid: 58451836d01c3a74c8199936cbd9b1ea, type: 3}
       propertyPath: baseJumpForce
       value: 35
