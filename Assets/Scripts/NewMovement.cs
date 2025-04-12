@@ -126,7 +126,8 @@ public class NewMovement : MonoBehaviour
     void ManageFalling()
     {
         // Reset fall time and gravity when grounded
-        if (isGrounded)
+        // rb velocity check designed to only apply increased gravity while the player is falling, not just aerial.
+        if (isGrounded && rb.linearVelocity.y < 0f)
         {
             fallTime = 0f;
             currentGravityForce = initialGravityForce;

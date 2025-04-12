@@ -11,6 +11,11 @@ public class PlayerStats : MonoBehaviour
     public float strength = 10f;
     public float defense = 5f;
     public float jumpForce = 30f;
+    public float ExpPickupRange = 3f;
+    public SphereCollider ExpPickupSphereCollider;
+    public int Exp = 0;
+    public int ExpToLevel = 50;
+    public int Level = 1;
 
     [Header("Temporary Boosts")]
     private Dictionary<string, Coroutine> activeBoosts = new();
@@ -18,6 +23,7 @@ public class PlayerStats : MonoBehaviour
     private void Start()
     {
         currentHealth = maxHealth;
+        ExpPickupSphereCollider.radius = ExpPickupRange;
     }
 
     public void TakeDamage(float damage)
@@ -76,6 +82,31 @@ public class PlayerStats : MonoBehaviour
         jumpForce += amount;
         jumpForce = Mathf.Max(0, jumpForce);
         Debug.Log($"Jump Force changed by {amount}. Current jumpForce: {jumpForce}");
+
+    }
+
+    public void ModifyExpPickupRange(float amount)
+    {
+        ExpPickupRange += amount;
+        ExpPickupRange = Mathf.Max(ExpPickupRange, 1f);
+        ExpPickupSphereCollider.radius = ExpPickupRange;
+    }
+    public void ModifyExp(int amount) 
+    {
+        Exp += amount;
+        if (Exp >= ExpToLevel)
+        {
+            Exp -= ExpToLevel;
+            LevelUp();
+            
+        }
+    }
+
+    public void LevelUp()
+    {
+        Level += 1;
+        ExpToLevel = (int)Mathf.Pow(2, Level);
+        // allow player to choose upgrade
 
     }
     #endregion

@@ -4,7 +4,7 @@ public class StatPickup : MonoBehaviour
 {
     // CHANGING THIS WILL ADJUST THE ASSIGNED STATS FOR THE PREFABS
     // ADD NEW STATS TO THE END OF THE LIST
-    public enum StatType { CurrentHealth, MaxHealth, Speed, Strength, Defense, Jump }
+    public enum StatType { CurrentHealth, MaxHealth, Speed, Strength, Defense, Jump, Exp, ExpPickupRange }
     
     [Header("Stat Settings")]
     public StatType statToModify;
@@ -18,14 +18,15 @@ public class StatPickup : MonoBehaviour
     public AudioClip pickupSound; 
 
     
+    // Maybe change to have magnetic effect 
     private void OnTriggerEnter(Collider other)
     {
+
         // Check if the object that entered the trigger is the player
-        if (other.CompareTag("Player"))
+        if ((other.CompareTag("ExpPickupCollider") && statToModify == StatType.Exp) || other.CompareTag("Player"))
         {
             // Get player's stats component
             PlayerStats playerStats = other.transform.parent.GetComponent<PlayerStats>();
-            Debug.Log($"Player Stats: {playerStats}");
             
             if (playerStats != null)
             {
@@ -77,6 +78,9 @@ public class StatPickup : MonoBehaviour
                     playerStats.ApplyTemporaryJumpBoost(statChangeAmount, duration);
                 else
                     playerStats.ModifyJump(statChangeAmount);
+                break;
+            case StatType.Exp:
+                playerStats.ModifyExp((int)statChangeAmount);
                 break;
         }
     }

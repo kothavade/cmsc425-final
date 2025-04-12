@@ -57,13 +57,24 @@ public class Enemy : MonoBehaviour
         print("Enemy took DMG:" + dmg);
         health -= dmg;
         if (health <= 0 && !dead) {
-            dead = true;
-            GameObjectPoolManager.Deactivate(gameObject);
+            KillEnemy();
             return -1;
         }
         return Mathf.Max(health, 0f);
     }
+    public void KillEnemy()
+    {
+        dead = true;
+        GameObjectPoolManager.Deactivate(gameObject);
+        // effects, sound effects, drops
+        DropExp();
 
+    }
+
+    public void DropExp()
+    {
+        
+    }
     void AttemptAttack()
     {
         if (Time.time >= nextAttackTime)
