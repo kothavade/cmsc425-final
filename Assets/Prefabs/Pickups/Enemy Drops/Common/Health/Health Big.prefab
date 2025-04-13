@@ -159,8 +159,9 @@ MonoBehaviour:
   destroyOnPickup: 1
   pickupEffect: {fileID: 0}
   pickupSound: {fileID: 8300000, guid: e5bdf1280a9552f409e296f25f8a0367, type: 3}
-  magnetSpeed: 15
-  magnetAcceleration: 10
+  magnetSpeed: 30
+  magnetAcceleration: 20
+  pickupDistance: 2
 --- !u!1 &3116334829637633342
 GameObject:
   m_ObjectHideFlags: 0

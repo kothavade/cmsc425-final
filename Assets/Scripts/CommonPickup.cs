@@ -31,10 +31,10 @@ public class CommonPickup : MonoBehaviour
     
     [Header("Magnetic Effect")]
     [Tooltip("Speed at which the pickup moves toward the player when magnetized")]
-    public float magnetSpeed = 15f;
+    public float magnetSpeed = 100f;
     
     [Tooltip("Acceleration of the magnetic pull effect")]
-    public float magnetAcceleration = 10f;
+    public float magnetAcceleration = 50f;
     
     // Whether the pickup is currently being pulled to the player
     private bool isBeingMagneted = false;
@@ -45,7 +45,7 @@ public class CommonPickup : MonoBehaviour
     // Current velocity of the magnetic movement
     private float currentMagnetSpeed;
 
-    public float pickupDistance = 2f;
+    public float pickupDistance = 1f;
 
     private void OnEnable()
     {

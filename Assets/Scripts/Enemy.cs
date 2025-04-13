@@ -86,8 +86,8 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        Mathf.Clamp(dropQuality, 1, maxDropsSelectionAmount);
-        Mathf.Clamp(probabilityForBetterDrop, 0f, 1f);
+        dropQuality = Mathf.Clamp(dropQuality, 0, maxDropsSelectionAmount - 1);
+        probabilityForBetterDrop = Mathf.Clamp(probabilityForBetterDrop, 0f, 1f);
     }
 
     void OnEnable()
@@ -221,7 +221,7 @@ public class Enemy : MonoBehaviour
         quality = Mathf.Clamp(quality, 0, drops.Length - 1);
         return drops[quality];
         */
-        return drops[GetNumberInRangeWithCompoundingProbability(dropQuality, maxDropsSelectionAmount, probabilityForBetterDrop, reductionFactorForIncreasinglyBetterDrop)];
+        return drops[GetNumberInRangeWithCompoundingProbability(dropQuality, maxDropsSelectionAmount - 1, probabilityForBetterDrop, reductionFactorForIncreasinglyBetterDrop)];
     }
     private void BurstSpawnDrop(GameObject drop)
     {

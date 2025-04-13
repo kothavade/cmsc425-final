@@ -159,8 +159,9 @@ MonoBehaviour:
   destroyOnPickup: 1
   pickupEffect: {fileID: 0}
   pickupSound: {fileID: 8300000, guid: 82b7e606c34799c4096be8c7d7377238, type: 3}
-  magnetSpeed: 15
-  magnetAcceleration: 10
+  magnetSpeed: 50
+  magnetAcceleration: 30
+  pickupDistance: 2
 --- !u!1 &3116334829637633342
 GameObject:
   m_ObjectHideFlags: 0
@@ -1199,7 +1200,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 10
+      scalar: 30
       minScalar: 10
       maxCurve:
         serializedVersion: 2

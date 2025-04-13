@@ -25,8 +25,6 @@ public class PlayerStats : MonoBehaviour
 
     [Tooltip("Radius in which player automatically collects experience points")]
     public float commonPickupRange = 3f;
-    [Tooltip("Radius in which common pickups are absorbed and deactivated.")]
-    public float pickupDistance = 2f;
 
     [SerializeField]
     [Tooltip("Factor by which experience requirement increases per level")]
@@ -47,6 +45,11 @@ public class PlayerStats : MonoBehaviour
     [Header("Temporary Boosts")]
     [Tooltip("Dictionary of active stat boost coroutines")]
     private Dictionary<string, Coroutine> activeBoosts = new();
+    
+    [Header("Audio")]
+    [Tooltip("Sound played when player takes damage")]
+    public AudioClip damageSound;
+    public AudioSource audioSource;
 
     private void Start()
     {
@@ -56,16 +59,28 @@ public class PlayerStats : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
+        
         float effectiveDamage = damage - defense;
         effectiveDamage = Mathf.Max(0, effectiveDamage);
+        HandleDamageEffects(effectiveDamage);
+
         currentHealth -= effectiveDamage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
 
         Debug.Log($"Took {effectiveDamage} damage. Current health: {currentHealth}");
 
+
         if (currentHealth <= 0)
         {
             Debug.Log("Player is dead!");
+        }
+    }
+
+    private void HandleDamageEffects(float effectiveDamage)
+    {
+        if (effectiveDamage > 0 && damageSound != null)
+        {
+            audioSource.PlayOneShot(damageSound);
         }
     }
 
@@ -264,9 +279,4 @@ public class PlayerStats : MonoBehaviour
     }
 
     #endregion
-
-    public float GetPickupDistance()
-    {
-        return pickupDistance;
-    }
 }

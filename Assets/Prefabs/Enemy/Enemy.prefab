@@ -33,7 +33,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 5.18, y: 2.21, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -157,8 +157,8 @@ MonoBehaviour:
   player: {fileID: 0}
   playerStats: {fileID: 0}
   damage: 10
-  attackRange: 2
-  bufferRange: 0.5
+  attackRange: 4
+  bufferRange: 2
   attackCooldown: 2
   max_health: 5
   health: 0
@@ -181,11 +181,11 @@ MonoBehaviour:
   numberOfExpDrops: 3
   maxDropsSelectionAmount: 3
   dropQuality: 0
-  probabilityForBetterDrop: 0
+  probabilityForBetterDrop: 0.2
   reductionFactorForIncreasinglyBetterDrop: 2
-  dropExplosionForce: 0.5
+  dropExplosionForce: 0.6
   dropBurstVectorLowerBounds: {x: -0.5, y: 1, z: -0.5}
-  dropBurstVectorUpperBounds: {x: 0.5, y: 3, z: 0.5}
+  dropBurstVectorUpperBounds: {x: 0.5, y: 10, z: 0.5}
   drops: []
 --- !u!195 &261296932872062096
 NavMeshAgent:
@@ -197,7 +197,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 7
+  m_Speed: 10
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
