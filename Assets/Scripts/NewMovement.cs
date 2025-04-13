@@ -4,62 +4,116 @@ using UnityEngine;
 public class NewMovement : MonoBehaviour
 {
     // Reference to orientation transform (for camera-relative movement)
+    [Tooltip("Transform that defines the player's orientation for movement direction")]
     [SerializeField] Transform orientation;
     
     [Header("Movement")]
-    [SerializeField] float baseMoveSpeed = 6f;   // Base movement speed
-    [SerializeField] float moveMultiplier = 10f; // Multiplier applied to movement force
-    [SerializeField] float airMultiplier = .8f;  // Reduced movement control in air
-    [SerializeField] float groundDrag = 6f;      // Higher drag when on ground
-    [SerializeField] float airDrag = 2f;         // Lower drag when in air
-    [SerializeField] float bHopWindow = 4f;      // Time window for bunny hopping
-    [SerializeField] float baseJumpForce = 30f;  // Force applied when jumping
+    [Tooltip("Base movement speed before player stat modifications. MAY NOT WORK PROPERLY, MAYBE CHANGE IN PLAYER STATS.")]
+    [SerializeField] float baseMoveSpeed = 6f;
+    
+    [Tooltip("Multiplier applied to movement force for tuning responsiveness")]
+    [SerializeField] float moveMultiplier = 10f;
+    
+    [Tooltip("Multiplier for air movement control (lower means less control in air)")]
+    [SerializeField] float airMultiplier = .8f;
+    
+    [Tooltip("Drag applied when on ground (higher values stop faster)")]
+    [SerializeField] float groundDrag = 6f;
+    
+    [Tooltip("Drag applied when in air (lower than ground drag for physics feel)")]
+    [SerializeField] float airDrag = 2f;
+    
+    [Tooltip("Time window in seconds where bunny hop physics are applied after leaving ground")]
+    [SerializeField] float bHopWindow = 4f;
+    
+    [Tooltip("Base jump force before player stat modifications. CHANGE THIS IN PLAYER STATS SCRIPT")]
+    [SerializeField] float baseJumpForce = 30f;
 
     [Header("Gravity")]
-    [SerializeField] float initialGravityForce = -70f;  // Initial gravity force
-    [SerializeField] float maxGravityForce = -200f;     // Maximum gravity force
-    [SerializeField] float gravityAcceleration = 20f;   // How quickly gravity increases
-    [SerializeField] float terminalFallVelocity = -40f; // Terminal velocity when falling
-    private float currentGravityForce;                 // Current gravity force being applied
-    private float fallTime = 0f;                       // How long the player has been falling
+    [Tooltip("Starting gravity force when player begins falling")]
+    [SerializeField] float initialGravityForce = -70f;
+    
+    [Tooltip("Maximum gravity force that can be applied (negative means downward)")]
+    [SerializeField] float maxGravityForce = -200f;
+    
+    [Tooltip("How quickly gravity force increases during fall")]
+    [SerializeField] float gravityAcceleration = 20f;
+    
+    [Tooltip("Maximum downward velocity the player can reach")]
+    [SerializeField] float terminalFallVelocity = -40f;
+    
+    // Current gravity force being applied to player
+    private float currentGravityForce;
+    
+    // Tracks how long the player has been falling
+    private float fallTime = 0f;
 
+    [Tooltip("Enables automatic jump when holding jump key (easier bunny hopping)")]
     [SerializeField] bool easyBHop = false;
+    
+    // Whether the player is currently in a jump
     private bool jumping = false;
+    
+    // Whether the jump key is currently being held down
     private bool jumpKeyHeld = false;
-    float timeOnGround = 0f;                     // Tracks time spent on ground for bunny hopping
+    
+    // Tracks time spent on ground for bunny hopping mechanics
+    float timeOnGround = 0f;
     
     // Reference to the PlayerStats component
     private PlayerStats playerStats;
     
-    // Current effective move speed (will be updated with player stats)
+    // Current effective move speed after player stat modifications
     private float currentMoveSpeed;
+    
+    // Current effective jump force after player stat modifications
     private float currentJumpForce;
     
     [Header("keybinds")]
-    [SerializeField] KeyCode jumpKey = KeyCode.Space;  // Key used for jumping
+    [Tooltip("Key used for jumping")]
+    [SerializeField] KeyCode jumpKey = KeyCode.Space;
     
     [Header("Ground Detection")]
-    [SerializeField] LayerMask groundMask;       // Layers that count as ground
-    [SerializeField] Transform groundCheck;      // Position to check for ground
-    float groundDistance = 0.4f;                 // Distance to check for ground
+    [Tooltip("Layers that are considered as ground for detection")]
+    [SerializeField] LayerMask groundMask;
     
-    bool isGrounded;                            // Current grounded state
+    [Tooltip("Transform position where ground checks are performed")]
+    [SerializeField] Transform groundCheck;
+    
+    [Tooltip("Radius of sphere cast used to check for ground")]
+    [SerializeField] private float groundDistance = 0.4f;
+    
+    // Whether the player is currently touching the ground
+    bool isGrounded;
+    
     public bool getIsGrounded(){
         return isGrounded;
     }
     
-    Rigidbody rb;                               // Reference to player's rigidbody
-    RaycastHit slopeHit;                        // Stores information about slope raycast
-    bool onSlope;                               // Whether player is on a slope
+    // Reference to player's rigidbody component
+    Rigidbody rb;
+    
+    // Stores information about slope raycast hit
+    RaycastHit slopeHit;
+    
+    // Whether player is currently on a sloped surface
+    bool onSlope;
 
-    Vector3 moveDirection;                      // Current movement direction
-    Vector3 slopeMoveDirection;                 // Direction adjusted for slopes
+    // Current movement direction based on input
+    Vector3 moveDirection;
+    
+    // Movement direction adjusted for slopes
+    Vector3 slopeMoveDirection;
 
-    // Movement input values
+    // Horizontal input value (-1 to 1)
     float horizontalMovement;
+    
+    // Vertical input value (-1 to 1)
     float verticalMovement;
 
-    float playerHeight = 2f;                     // Height of player for ground checks
+    // Height of player for ground checks and calculations
+    float playerHeight = 2f;
+
 
     // Checks if player is on a sloped surface
     private bool OnSlope()
@@ -127,12 +181,12 @@ public class NewMovement : MonoBehaviour
     {
         // Reset fall time and gravity when grounded
         // rb velocity check designed to only apply increased gravity while the player is falling, not just aerial.
-        if (isGrounded && rb.linearVelocity.y < 0f)
+        if (isGrounded || rb.linearVelocity.y >= 0f)
         {
             fallTime = 0f;
             currentGravityForce = initialGravityForce;
         }
-        else
+        else if (!isGrounded && rb.linearVelocity.y < 0f)
         {
             // Increase fall time when in air
             fallTime += Time.deltaTime;

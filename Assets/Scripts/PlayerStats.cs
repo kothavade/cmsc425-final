@@ -5,25 +5,53 @@ using UnityEngine;
 public class PlayerStats : MonoBehaviour
 {
     [Header("Base Stats")]
+    [Tooltip("Maximum health points the player can have")]
     public float maxHealth = 100f;
+
+    [Tooltip("Current health points of the player")]
     public float currentHealth;
+
+    [Tooltip("Base movement speed of the player")]
     public float moveSpeed = 5f;
+
+    [Tooltip("Player's strength stat, affects damage dealt")]
     public float strength = 10f;
+
+    [Tooltip("Player's defense stat, reduces damage taken")]
     public float defense = 5f;
+
+    [Tooltip("Force applied when player jumps")]
     public float jumpForce = 30f;
-    public float ExpPickupRange = 3f;
+
+    [Tooltip("Radius in which player automatically collects experience points")]
+    public float commonPickupRange = 3f;
+    [Tooltip("Radius in which common pickups are absorbed and deactivated.")]
+    public float pickupDistance = 2f;
+
+    [SerializeField]
+    [Tooltip("Factor by which experience requirement increases per level")]
+    private float expRequirementIncreaseFactor = 2f;
+
+    [Tooltip("Sphere collider used for automatic experience pickup")]
     public SphereCollider ExpPickupSphereCollider;
+
+    [Tooltip("Current experience points")]
     public int Exp = 0;
-    public int ExpToLevel = 50;
+
+    [Tooltip("Experience points required to level up")]
+    public int ExpToLevel = 1;
+
+    [Tooltip("Current player level")]
     public int Level = 1;
 
     [Header("Temporary Boosts")]
+    [Tooltip("Dictionary of active stat boost coroutines")]
     private Dictionary<string, Coroutine> activeBoosts = new();
 
     private void Start()
     {
         currentHealth = maxHealth;
-        ExpPickupSphereCollider.radius = ExpPickupRange;
+        ExpPickupSphereCollider.radius = commonPickupRange;
     }
 
     public void TakeDamage(float damage)
@@ -52,7 +80,7 @@ public class PlayerStats : MonoBehaviour
     public void ModifyCurrentHealth(float amount)
     {
         currentHealth += amount;
-        currentHealth = Mathf.Max(currentHealth, maxHealth);
+        currentHealth = Mathf.Min(currentHealth, maxHealth);
         Debug.Log($"Current Health changed by {amount}. Current Health: {currentHealth}");
     }
 
@@ -85,30 +113,39 @@ public class PlayerStats : MonoBehaviour
 
     }
 
-    public void ModifyExpPickupRange(float amount)
+    public void ModifyCommonPickupRange(float amount)
     {
-        ExpPickupRange += amount;
-        ExpPickupRange = Mathf.Max(ExpPickupRange, 1f);
-        ExpPickupSphereCollider.radius = ExpPickupRange;
+        commonPickupRange += amount;
+        commonPickupRange = Mathf.Max(commonPickupRange, 1f);
+        ExpPickupSphereCollider.radius = commonPickupRange;
     }
-    public void ModifyExp(int amount) 
+    public void ModifyExp(int amount)
     {
         Exp += amount;
         if (Exp >= ExpToLevel)
         {
             Exp -= ExpToLevel;
             LevelUp();
-            
+
         }
     }
-
     public void LevelUp()
     {
         Level += 1;
-        ExpToLevel = (int)Mathf.Pow(2, Level);
+        ExpToLevel = (int)(expRequirementIncreaseFactor * Level);
         // allow player to choose upgrade
 
     }
+
+    public float GetExpPercentage()
+    {
+        return (float)Exp / ExpToLevel;
+    }
+    public int GetLevel()
+    {
+        return Level;
+    }
+
     #endregion
 
     #region Temporary Stat Boosts
@@ -145,6 +182,11 @@ public class PlayerStats : MonoBehaviour
         StopBoostIfActive("jump");
         activeBoosts["jump"] = StartCoroutine(TemporaryStatBoost("jump", amount, duration));
     }
+    public void ApplyTemporaryCommonPickupRangeBoost(float amount, float duration)
+    {
+        StopBoostIfActive("common pickup range");
+        activeBoosts["common pickup range"] = StartCoroutine(TemporaryStatBoost("common pickup range", amount, duration));
+    }
 
     private void StopBoostIfActive(string statName)
     {
@@ -180,6 +222,10 @@ public class PlayerStats : MonoBehaviour
                 jumpForce += amount;
                 Debug.Log($"Applied temporary jump boost of {amount} for {duration} seconds");
                 break;
+            case "common pickup range":
+                ModifyCommonPickupRange(amount);
+                Debug.Log($"Applied temporary common pickup range boost of {amount} for {duration} seconds");
+                break;
         }
 
         // Wait for the duration
@@ -207,6 +253,10 @@ public class PlayerStats : MonoBehaviour
                 jumpForce -= amount;
                 Debug.Log($"Jump boost of {amount} ended. Current jump: {jumpForce}");
                 break;
+            case "common pickup range":
+                ModifyCommonPickupRange(-amount);
+                Debug.Log($"Common pickup range boost of {amount} ended. Current cpr: {commonPickupRange}");
+                break;
 
         }
 
@@ -214,4 +264,9 @@ public class PlayerStats : MonoBehaviour
     }
 
     #endregion
+
+    public float GetPickupDistance()
+    {
+        return pickupDistance;
+    }
 }

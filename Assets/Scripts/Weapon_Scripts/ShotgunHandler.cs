@@ -11,6 +11,8 @@ public class ShotgunHandler : MonoBehaviour
     public float spread;
     public float recoil_intensity;
     private bool hasTouchedGround = false;
+    [SerializeField]
+    private int projectileCount = 8;
 
     void Start(){
         Player = GameObject.Find("Player").GetComponent<PublicMover>();
@@ -53,7 +55,7 @@ public class ShotgunHandler : MonoBehaviour
     void Fire(){
         ApplyRecoil();
         Weapon.fireAmmo(1);
-        for ( int i = 0; i < 8; i++){
+        for ( int i = 0; i < projectileCount; i++){
             GameObjectPoolManager.SpawnObject(ShotgunPellet, ProjectileSpawner.position, ProjectileSpawner.rotation * Quaternion.Euler(Random.Range(-spread, spread),Random.Range(-spread, spread),Random.Range(-spread, spread)));
             hasTouchedGround = false;
         }

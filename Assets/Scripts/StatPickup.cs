@@ -4,36 +4,36 @@ public class StatPickup : MonoBehaviour
 {
     // CHANGING THIS WILL ADJUST THE ASSIGNED STATS FOR THE PREFABS
     // ADD NEW STATS TO THE END OF THE LIST
-    public enum StatType { CurrentHealth, MaxHealth, Speed, Strength, Defense, Jump, Exp, ExpPickupRange }
-    
+    public enum StatType { CurrentHealth, MaxHealth, Speed, Strength, Defense, Jump, CommonPickupRange }
+
     [Header("Stat Settings")]
     public StatType statToModify;
     public float statChangeAmount = 10f;
     public bool isTemporary = false;
-    public float duration = 10f; 
-    
+    public float duration = 10f;
+
     [Header("Pickup Settings")]
     public bool destroyOnPickup = true;
-    public GameObject pickupEffect; 
-    public AudioClip pickupSound; 
+    public GameObject pickupEffect;
+    public AudioClip pickupSound;
 
-    
+
     // Maybe change to have magnetic effect 
     private void OnTriggerEnter(Collider other)
     {
 
         // Check if the object that entered the trigger is the player
-        if ((other.CompareTag("ExpPickupCollider") && statToModify == StatType.Exp) || other.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
             // Get player's stats component
             PlayerStats playerStats = other.transform.parent.GetComponent<PlayerStats>();
-            
+
             if (playerStats != null)
             {
                 Debug.Log($"Attempting to adjust {statToModify} by {statChangeAmount}");
                 ApplyStatModification(playerStats);
                 HandlePickupEffects();
-                
+
                 if (destroyOnPickup)
                 {
                     Destroy(gameObject);
@@ -41,7 +41,7 @@ public class StatPickup : MonoBehaviour
             }
         }
     }
-    
+
     private void ApplyStatModification(PlayerStats playerStats)
     {
         switch (statToModify)
@@ -53,7 +53,7 @@ public class StatPickup : MonoBehaviour
                     playerStats.ModifyMaxHealth(statChangeAmount);
                 break;
             case StatType.CurrentHealth:
-                    playerStats.ModifyCurrentHealth(statChangeAmount);
+                playerStats.ModifyCurrentHealth(statChangeAmount);
                 break;
             case StatType.Speed:
                 if (isTemporary)
@@ -79,12 +79,15 @@ public class StatPickup : MonoBehaviour
                 else
                     playerStats.ModifyJump(statChangeAmount);
                 break;
-            case StatType.Exp:
-                playerStats.ModifyExp((int)statChangeAmount);
+            case StatType.CommonPickupRange:
+                if (isTemporary)
+                    playerStats.ApplyTemporaryCommonPickupRangeBoost(statChangeAmount, duration);
+                else
+                    playerStats.ModifyCommonPickupRange(statChangeAmount);
                 break;
         }
     }
-    
+
     private void HandlePickupEffects()
     {
         // Play sound effect if assigned
@@ -92,7 +95,7 @@ public class StatPickup : MonoBehaviour
         {
             AudioSource.PlayClipAtPoint(pickupSound, transform.position);
         }
-        
+
         // Spawn visual effect if assigned
         if (pickupEffect != null)
         {

@@ -55,14 +55,16 @@ public class GameObjectPoolManager : MonoBehaviour
     }
 
     // replaces Destroy(), deactivates an object and returns it to the inactive pool
-    public static void Deactivate(GameObject obj) {
+    public static bool Deactivate(GameObject obj) {
         ObjectPool pool = PoolList.Find(p => p.pool_name+ "(Clone)" == obj.name ); // newly instantiated objects will all be clones
 
         if (pool == null) {
             Debug.LogWarning("You're trying to deactivate an object with no pool:" + obj.name);
+            return false;
         } else {
             obj.SetActive(false);
             pool.InactiveObjects.Add(obj);
+            return true;
         }
     }
 

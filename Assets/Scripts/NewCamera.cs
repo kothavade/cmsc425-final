@@ -3,20 +3,26 @@ using UnityEngine;
 public class NewCamera : MonoBehaviour
 {
    // Mouse sensitivity settings
-   [SerializeField] private float sensX;       // Horizontal mouse sensitivity
-   [SerializeField] private float sensY;       // Vertical mouse sensitivity
+   [Tooltip("Horizontal mouse sensitivity - higher values make camera turn faster horizontally")]
+   [SerializeField] private float sensX;
+   
+   [Tooltip("Vertical mouse sensitivity - higher values make camera turn faster vertically")]
+   [SerializeField] private float sensY;
    
    // References to important transforms
-   [SerializeField] Transform cam;             // Camera transform (for rotation)
-   [SerializeField] Transform orientation;     // Player orientation reference
+   [Tooltip("Reference to the camera transform that will be rotated")]
+   [SerializeField] Transform cam;
+   
+   [Tooltip("Reference to the player orientation transform used for movement direction")]
+   [SerializeField] Transform orientation;
    
    // Mouse input values
-   float mouseX;                              // Raw horizontal mouse input
-   float mouseY;                              // Raw vertical mouse input
+   private float mouseX;                              // Raw horizontal mouse input
+   private float mouseY;                              // Raw vertical mouse input
    
-   float multiplier = 0.01f;                  // Converts raw mouse input to reasonable rotation values
-   float xRotation;                           // Current vertical camera angle (looking up/down)
-   float yRotation;                           // Current horizontal camera angle (looking left/right)
+   private float multiplier = 0.01f;                  // Converts raw mouse input to reasonable rotation values
+   private float xRotation;                           // Current vertical camera angle (looking up/down)
+   private float yRotation;                           // Current horizontal camera angle (looking left/right)
    
    private void Start()
    {

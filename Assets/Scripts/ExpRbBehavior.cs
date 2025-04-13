@@ -11,7 +11,7 @@ public class ExpRbBehavior : MonoBehaviour
         Debug.Log("Exp collider triggered");
         if (Physics.CheckSphere(transform.position, groundDistance, groundMask))
         {
-            Debug.Log(rb.linearVelocity.y);
+            // Debug.Log(rb.linearVelocity.y);
             if ((rb.linearVelocity.y <= .1f) && (rb.linearVelocity.y >= -.1f))
             {
                 Debug.Log("setting exp rb to kinematic");

@@ -13,6 +13,7 @@ public class PlayerUI : MonoBehaviour
     public TextMeshProUGUI strengthText;
     public TextMeshProUGUI defenseText;
     public TextMeshProUGUI jumpText;
+    public TextMeshProUGUI commonPickupRangeText;
 
     void Update()
     {
@@ -38,6 +39,9 @@ public class PlayerUI : MonoBehaviour
         
         if (jumpText != null)
             jumpText.text = $"Jump Force: {playerStats.jumpForce:F1}";
+
+        if (commonPickupRangeText != null)
+            commonPickupRangeText.text = $"Common Pickup Range: {playerStats.commonPickupRange:F1}";
 
     }
 }
