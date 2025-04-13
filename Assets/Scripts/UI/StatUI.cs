@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class PlayerUI : MonoBehaviour
+public class StatUI : MonoBehaviour
 {
     [Header("References")]
     public GameObject player;
