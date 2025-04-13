@@ -26,6 +26,16 @@ public class PlayerStats : MonoBehaviour
     [Tooltip("Radius in which player automatically collects experience points")]
     public float commonPickupRange = 3f;
 
+    [Header("Upgrade System")]
+    [Tooltip("All possible upgrades the player can receive")]
+    public List<Upgrade> possibleUpgrades = new List<Upgrade>();
+
+    [Tooltip("How many upgrade options to present per level")]
+    public int upgradeOptionsPerLevel = 3;
+
+    [Tooltip("Reference to the upgrade selection UI panel")]
+    public UpgradeSelectionUI upgradeSelectionUI;
+
     [SerializeField]
     [Tooltip("Factor by which experience requirement increases per level")]
     private float expRequirementIncreaseFactor = 2f;
@@ -45,11 +55,15 @@ public class PlayerStats : MonoBehaviour
     [Header("Temporary Boosts")]
     [Tooltip("Dictionary of active stat boost coroutines")]
     private Dictionary<string, Coroutine> activeBoosts = new();
-    
+
     [Header("Audio")]
     [Tooltip("Sound played when player takes damage")]
     public AudioClip damageSound;
     public AudioSource audioSource;
+
+    [Header("Misc")]
+    public float upgradeSelectionTimeScale = .05f;
+
 
     private void Start()
     {
@@ -59,7 +73,7 @@ public class PlayerStats : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        
+
         float effectiveDamage = damage - defense;
         effectiveDamage = Mathf.Max(0, effectiveDamage);
         HandleDamageEffects(effectiveDamage);
@@ -144,12 +158,97 @@ public class PlayerStats : MonoBehaviour
 
         }
     }
+
+    #endregion
     public void LevelUp()
     {
         Level += 1;
         ExpToLevel = (int)(expRequirementIncreaseFactor * Level);
-        // allow player to choose upgrade
 
+        // Show upgrade selection UI
+        PresentUpgradeOptions();
+
+        // Pause game
+        Time.timeScale = upgradeSelectionTimeScale;
+
+    }
+
+    private void PresentUpgradeOptions()
+    {
+        if (upgradeSelectionUI == null)
+        {
+            Debug.LogError("Upgrade Selection UI reference is missing");
+            return;
+        }
+
+        // Get random selection of upgrades
+        List<Upgrade> selectedUpgrades = GetRandomUpgrades(upgradeOptionsPerLevel);
+
+        Debug.Log("Attempting to show upgrade panel");
+        upgradeSelectionUI.gameObject.SetActive(true);
+        upgradeSelectionUI.ShowUpgradeOptions(selectedUpgrades, OnUpgradeSelected);
+    }
+
+    private List<Upgrade> GetRandomUpgrades(int count)
+    {
+        // Create a copy of the possible upgrades list to avoid modifying the original
+        List<Upgrade> availableUpgrades = new List<Upgrade>(possibleUpgrades);
+        List<Upgrade> selectedUpgrades = new List<Upgrade>();
+
+        // Select random upgrades
+        int selectionCount = Mathf.Min(count, availableUpgrades.Count);
+        for (int i = 0; i < selectionCount; i++)
+        {
+            int randomIndex = Random.Range(0, availableUpgrades.Count);
+            selectedUpgrades.Add(availableUpgrades[randomIndex]);
+            availableUpgrades.RemoveAt(randomIndex);
+        }
+
+        return selectedUpgrades;
+    }
+
+    public void OnUpgradeSelected(Upgrade selectedUpgrade)
+    {
+        Debug.Log("OnUpgradeSelected called with: " + selectedUpgrade.upgradeName);
+
+        // Apply the selected upgrade
+        ApplyUpgrade(selectedUpgrade);
+
+        // Resume game
+        Time.timeScale = 1f;
+
+        // Hide panel
+        upgradeSelectionUI.gameObject.SetActive(false);
+    }
+
+    // This will need to be handled differently eventually
+    private void ApplyUpgrade(Upgrade upgrade)
+    {
+        // Apply the appropriate stat boost based on upgrade type
+        switch (upgrade.type)
+        {
+            case Upgrade.UpgradeType.MaxHealth:
+                ModifyMaxHealth(upgrade.value);
+                ModifyCurrentHealth(upgrade.value);
+                break;
+            case Upgrade.UpgradeType.Speed:
+                ModifySpeed(upgrade.value);
+                break;
+            case Upgrade.UpgradeType.Strength:
+                ModifyStrength(upgrade.value);
+                break;
+            case Upgrade.UpgradeType.Defense:
+                ModifyDefense(upgrade.value);
+                break;
+            case Upgrade.UpgradeType.JumpForce:
+                ModifyJump(upgrade.value);
+                break;
+            case Upgrade.UpgradeType.CommonPickupRange:
+                ModifyCommonPickupRange(upgrade.value);
+                break;
+        }
+
+        Debug.Log($"Applied upgrade: {upgrade.upgradeName}");
     }
 
     public float GetExpPercentage()
@@ -160,8 +259,6 @@ public class PlayerStats : MonoBehaviour
     {
         return Level;
     }
-
-    #endregion
 
     #region Temporary Stat Boosts
 

@@ -181,8 +181,8 @@ MonoBehaviour:
   numberOfExpDrops: 3
   maxDropsSelectionAmount: 3
   dropQuality: 0
-  probabilityForBetterDrop: 0.2
-  reductionFactorForIncreasinglyBetterDrop: 2
+  probabilityForBetterDrop: 0.1
+  reductionFactorForIncreasinglyBetterDrop: 10
   dropExplosionForce: 0.6
   dropBurstVectorLowerBounds: {x: -0.5, y: 1, z: -0.5}
   dropBurstVectorUpperBounds: {x: 0.5, y: 10, z: 0.5}

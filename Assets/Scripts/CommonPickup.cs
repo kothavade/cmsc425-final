@@ -132,7 +132,7 @@ public class CommonPickup : MonoBehaviour
                     //Debug.Log("trying to deactive common pickup");
                     if (!GameObjectPoolManager.Deactivate(gameObject))
                     {
-                        Destroy(gameObject);
+                        DestroyImmediate(gameObject);
                     }
                 }
             }
