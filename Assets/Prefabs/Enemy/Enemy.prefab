@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3854733313327694844}
   - component: {fileID: 4947883133813572243}
   - component: {fileID: 1116728474830518864}
+  - component: {fileID: 5962999393841267167}
   - component: {fileID: 261296932872062096}
   - component: {fileID: 3123529017555492244}
   m_Layer: 0
@@ -162,31 +163,41 @@ MonoBehaviour:
   attackCooldown: 2
   max_health: 5
   health: 0
+--- !u!114 &5962999393841267167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1665190061075893145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 563d08afe51250a4eb632065bd84797a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   expDrops:
   - {fileID: 2504506660737205666, guid: 82a627acf9e28e84ea246615010d2f0c, type: 3}
   - {fileID: 2504506660737205666, guid: a2200a0e78c365a49aea901b2f7d9933, type: 3}
   - {fileID: 4979759192788386536, guid: 52a176b57d091f540be09708b7a05913, type: 3}
   expDropProbability: 1
   reductionFactorForSubsequentExpDrops: 2
-  maxPotentialExpDrops: 3
+  maxPotentialExpDrops: 5
   minPotentialExpDrops: 3
   healthDrops:
   - {fileID: 2504506660737205666, guid: d5cf5dac9ad3a6744ab1082cf4c0599b, type: 3}
   - {fileID: 2504506660737205666, guid: cefa3a5921f1a304aa6b4a737801a805, type: 3}
   - {fileID: 2504506660737205666, guid: b567366a62600c944af77d9bbf600c1f, type: 3}
-  healthDropProbability: 0.5
-  reductionFactorForSubsequentHealthDrops: 1.5
+  healthDropProbability: 0.2
+  reductionFactorForSubsequentHealthDrops: 2
   maxPotentialHealthDrops: 3
   minPotentialHealthDrops: 0
-  numberOfExpDrops: 5
   maxDropsSelectionAmount: 3
   dropQuality: 0
-  probabilityForBetterDrop: 0.1
-  reductionFactorForIncreasinglyBetterDrop: 10
-  dropExplosionForce: 0.6
-  dropBurstVectorLowerBounds: {x: -0.5, y: 1, z: -0.5}
-  dropBurstVectorUpperBounds: {x: 0.5, y: 4, z: 0.5}
-  drops: []
+  probabilityForBetterDrop: 0
+  reductionFactorForIncreasinglyBetterDrop: 2
+  dropExplosionForce: 1
+  dropBurstVectorLowerBounds: {x: -0.5, y: 0.5, z: -0.5}
+  dropBurstVectorUpperBounds: {x: 0.5, y: 2, z: 0.5}
 --- !u!195 &261296932872062096
 NavMeshAgent:
   m_ObjectHideFlags: 0

@@ -9,6 +9,7 @@ public class UpgradeOptionButton : MonoBehaviour
     public TextMeshProUGUI titleText;
     public TextMeshProUGUI descriptionText;
     public Button button;
+    public Image qualityBorder;
 
     private Upgrade upgrade;
     private Action<Upgrade> onClickCallback;
@@ -22,6 +23,14 @@ public class UpgradeOptionButton : MonoBehaviour
         if (iconImage != null) iconImage.sprite = upgrade.icon;
         if (titleText != null) titleText.text = upgrade.upgradeName;
         if (descriptionText != null) descriptionText.text = upgrade.description;
+        // Shows items quality by changing color of icon and border, should probably be more clear.
+        if (qualityBorder != null) 
+        {
+            Color qualityColor = upgrade.GetQualityColor();
+            qualityBorder.color = qualityColor;
+            iconImage.color = qualityColor;
+            button.GetComponent<Image>().color = qualityColor;
+        }
 
         // Set button click handler
         button.onClick.RemoveAllListeners();

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerStats : MonoBehaviour
+public class PlayerStats_bak : MonoBehaviour
 {
     [Header("Base Stats")]
     [Tooltip("Maximum health points the player can have")]
@@ -26,10 +26,23 @@ public class PlayerStats : MonoBehaviour
     [Tooltip("Radius in which player automatically collects experience points")]
     public float commonPickupRange = 3f;
 
+    [Header("Upgrade System")]
+    [Tooltip("All possible upgrades the player can receive")]
+    public List<Upgrade> possibleUpgrades = new List<Upgrade>();
+
+    [Tooltip("How many upgrade options to present per level")]
+    public int upgradeOptionsPerLevel = 3;
+
+    [Tooltip("Reference to the upgrade selection UI panel")]
+    public UpgradeSelectionUI upgradeSelectionUI;
+
+    [SerializeField]
+    [Tooltip("Factor by which experience requirement increases per level")]
+    private float expRequirementIncreaseFactor = 2f;
+
     [Tooltip("Sphere collider used for automatic experience pickup")]
     public SphereCollider ExpPickupSphereCollider;
 
-    [Header("Experience System")]
     [Tooltip("Current experience points")]
     public int Exp = 0;
 
@@ -38,10 +51,6 @@ public class PlayerStats : MonoBehaviour
 
     [Tooltip("Current player level")]
     public int Level = 1;
-
-    [SerializeField]
-    [Tooltip("Factor by which experience requirement increases per level")]
-    private float expRequirementIncreaseFactor = 2f;
 
     [Header("Temporary Boosts")]
     [Tooltip("Dictionary of active stat boost coroutines")]
@@ -52,17 +61,19 @@ public class PlayerStats : MonoBehaviour
     public AudioClip damageSound;
     public AudioSource audioSource;
 
-    private PlayerUpgrades playerUpgrades;
+    [Header("Misc")]
+    public float upgradeSelectionTimeScale = .05f;
+
 
     private void Start()
     {
         currentHealth = maxHealth;
         ExpPickupSphereCollider.radius = commonPickupRange;
-        playerUpgrades = GetComponent<PlayerUpgrades>();
     }
 
     public void TakeDamage(float damage)
     {
+
         float effectiveDamage = damage - defense;
         effectiveDamage = Mathf.Max(0, effectiveDamage);
         HandleDamageEffects(effectiveDamage);
@@ -72,9 +83,10 @@ public class PlayerStats : MonoBehaviour
 
         Debug.Log($"Took {effectiveDamage} damage. Current health: {currentHealth}");
 
+
         if (currentHealth <= 0)
         {
-            Debug.Log("Player is dead");
+            Debug.Log("Player is dead!");
         }
     }
 
@@ -127,6 +139,7 @@ public class PlayerStats : MonoBehaviour
         jumpForce += amount;
         jumpForce = Mathf.Max(0, jumpForce);
         Debug.Log($"Jump Force changed by {amount}. Current jumpForce: {jumpForce}");
+
     }
 
     public void ModifyCommonPickupRange(float amount)
@@ -135,7 +148,6 @@ public class PlayerStats : MonoBehaviour
         commonPickupRange = Mathf.Max(commonPickupRange, 1f);
         ExpPickupSphereCollider.radius = commonPickupRange;
     }
-
     public void ModifyExp(int amount)
     {
         Exp += amount;
@@ -143,37 +155,113 @@ public class PlayerStats : MonoBehaviour
         {
             Exp -= ExpToLevel;
             LevelUp();
+
         }
     }
-    #endregion
 
+    #endregion
     public void LevelUp()
     {
         Level += 1;
         ExpToLevel = (int)(expRequirementIncreaseFactor * ExpToLevel);
 
-        // Delegate upgrade handling to PlayerUpgrades component
-        if (playerUpgrades != null)
+        // Show upgrade selection UI
+        PresentUpgradeOptions();
+
+        // Pause game
+        Time.timeScale = upgradeSelectionTimeScale;
+
+    }
+
+    private void PresentUpgradeOptions()
+    {
+        if (upgradeSelectionUI == null)
         {
-            playerUpgrades.HandleLevelUp();
+            Debug.LogError("Upgrade Selection UI reference is missing");
+            return;
         }
-        else
+
+        // Get random selection of upgrades
+        List<Upgrade> selectedUpgrades = GetRandomUpgrades(upgradeOptionsPerLevel);
+
+        Debug.Log("Attempting to show upgrade panel");
+        upgradeSelectionUI.gameObject.SetActive(true);
+        upgradeSelectionUI.ShowUpgradeOptions(selectedUpgrades, OnUpgradeSelected);
+    }
+
+    private List<Upgrade> GetRandomUpgrades(int count)
+    {
+        // Create a copy of the possible upgrades list to avoid modifying the original
+        List<Upgrade> availableUpgrades = new List<Upgrade>(possibleUpgrades);
+        List<Upgrade> selectedUpgrades = new List<Upgrade>();
+
+        // Select random upgrades
+        int selectionCount = Mathf.Min(count, availableUpgrades.Count);
+        for (int i = 0; i < selectionCount; i++)
         {
-            Debug.LogError("PlayerUpgrades component is missing");
+            int randomIndex = Random.Range(0, availableUpgrades.Count);
+            selectedUpgrades.Add(availableUpgrades[randomIndex]);
+            availableUpgrades.RemoveAt(randomIndex);
         }
+
+        return selectedUpgrades;
+    }
+
+    public void OnUpgradeSelected(Upgrade selectedUpgrade)
+    {
+        Debug.Log("OnUpgradeSelected called with: " + selectedUpgrade.upgradeName);
+
+        // Apply the selected upgrade
+        ApplyUpgrade(selectedUpgrade);
+
+        // Resume game
+        Time.timeScale = 1f;
+
+        // Hide panel
+        upgradeSelectionUI.gameObject.SetActive(false);
+    }
+
+    // This will need to be handled differently eventually
+    private void ApplyUpgrade(Upgrade upgrade)
+    {
+        // Apply the appropriate stat boost based on upgrade type
+        switch (upgrade.type)
+        {
+            case Upgrade.UpgradeType.MaxHealth:
+                ModifyMaxHealth(upgrade.value);
+                ModifyCurrentHealth(upgrade.value);
+                break;
+            case Upgrade.UpgradeType.Speed:
+                ModifySpeed(upgrade.value);
+                break;
+            case Upgrade.UpgradeType.Strength:
+                ModifyStrength(upgrade.value);
+                break;
+            case Upgrade.UpgradeType.Defense:
+                ModifyDefense(upgrade.value);
+                break;
+            case Upgrade.UpgradeType.JumpForce:
+                ModifyJump(upgrade.value);
+                break;
+            case Upgrade.UpgradeType.CommonPickupRange:
+                ModifyCommonPickupRange(upgrade.value);
+                break;
+        }
+
+        Debug.Log($"Applied upgrade: {upgrade.upgradeName}");
     }
 
     public float GetExpPercentage()
     {
         return (float)Exp / ExpToLevel;
     }
-
     public int GetLevel()
     {
         return Level;
     }
 
     #region Temporary Stat Boosts
+
     public void ApplyTemporaryHealthBoost(float amount, float duration)
     {
         // Stop any active health boost
@@ -206,7 +294,6 @@ public class PlayerStats : MonoBehaviour
         StopBoostIfActive("jump");
         activeBoosts["jump"] = StartCoroutine(TemporaryStatBoost("jump", amount, duration));
     }
-
     public void ApplyTemporaryCommonPickupRangeBoost(float amount, float duration)
     {
         StopBoostIfActive("common pickup range");
@@ -282,9 +369,11 @@ public class PlayerStats : MonoBehaviour
                 ModifyCommonPickupRange(-amount);
                 Debug.Log($"Common pickup range boost of {amount} ended. Current cpr: {commonPickupRange}");
                 break;
+
         }
 
         activeBoosts[statName] = null;
     }
+
     #endregion
 }

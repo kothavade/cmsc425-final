@@ -29,72 +29,24 @@ public class Enemy : MonoBehaviour
 
     [Tooltip("Current health points of the enemy")]
     public float health;
-
-    [Header("Drop System")]
-    [Tooltip("Exp drops that can be dropped. Should be size 3 (unless changed later).")]
-    public GameObject[] expDrops = new GameObject[3];
-    [Tooltip("Probability that the enemy will also drop a exp pickup. When maxPotentialExpDrops is more than one, the probability is applied multiplicatively with every subsequent drop.")]
-    public float expDropProbability = 1f;
-    [Tooltip("Reduction factor for increasingly good drops. probabilityForBetterDrop is divided by this everytime it rolls for drop quality.")]
-    public float reductionFactorForSubsequentExpDrops = 2f;
-    [Tooltip("Max number of exp drops that may be dropped. Note: exp drop size depends on drop quality field.")]
-    public int maxPotentialExpDrops = 3;
-
-    [Tooltip("Min number of exp drops that may be dropped. Note: exp drop size depends on drop quality field.")]
-    public int minPotentialExpDrops = 3;
-
-    [Tooltip("Health drops that can be dropped. Should be size 3 (unless changed later).")]
-    public GameObject[] healthDrops = new GameObject[3];
-
-    [Tooltip("Probability that the enemy will also drop a health pickup. When maxPotentialHealthDrops is more than one, the probability is applied multiplicatively with every subsequent drop.")]
-    public float healthDropProbability = .5f;
-    [Tooltip("Reduction factor for increasingly good drops. probabilityForBetterDrop is divided by this everytime it rolls for drop quality.")]
-    public float reductionFactorForSubsequentHealthDrops = 2f;
-    [Tooltip("Max number of health drops that may be dropped. Note: health drop size depends on drop quality field.")]
-    public int maxPotentialHealthDrops = 3;
-
-    [Tooltip("Min number of health drops that may be dropped. Note: health drop size depends on drop quality field.")]
-    public int minPotentialHealthDrops = 0;
-
-    [Tooltip("Number of experience drops spawned when enemy dies")]
-    public int numberOfExpDrops = 3;
-
-    [Tooltip("Leave at 3, might be useful later but does nothing for now.")]
-    public int maxDropsSelectionAmount = 3;
-
-    [Tooltip("Quality of drops (1=Small, 2=Medium, 3=Big)")]
-    public int dropQuality = 1;
-
-    [Tooltip("Probablity that drops better than dropQuality are dropped. 0 is no chance, 1 is guaranteed items are at least one tier better.")]
-    public float probabilityForBetterDrop = 0f;
-
-    [Tooltip("Reduction factor for increasingly good drops. probabilityForBetterDrop is divided by this everytime it rolls for drop quality.")]
-    public float reductionFactorForIncreasinglyBetterDrop = 2f;
-
-    [Tooltip("Force applied to experience drops when spawned")]
-    public float dropExplosionForce = 1f;
-
-    [Tooltip("Lower bounds for the random explosion vector applied when dropping items.")]
-    public Vector3 dropBurstVectorLowerBounds = new Vector3(-1f, .5f, 1f);
-    [Tooltip("Upper bounds for the random explosion vector applied when dropping items.")]
-    public Vector3 dropBurstVectorUpperBounds = new Vector3(1f, 2f, 1f);
+    
+    [Tooltip("Reference to the EnemyDrops component")]
+    private EnemyDrops enemyDrops;
 
     bool dead = false;
     float nextAttackTime = 0f;
-    public GameObject[] drops;
+    
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        dropQuality = Mathf.Clamp(dropQuality, 0, maxDropsSelectionAmount - 1);
-        probabilityForBetterDrop = Mathf.Clamp(probabilityForBetterDrop, 0f, 1f);
+        enemyDrops = GetComponent<EnemyDrops>();
     }
 
     void OnEnable()
     {
         health = max_health;
         dead = false;
-
     }
 
     void Update()
@@ -134,14 +86,20 @@ public class Enemy : MonoBehaviour
         }
         return Mathf.Max(health, 0f);
     }
+    
     public void KillEnemy()
     {
         dead = true;
+        // Handle drops before deactivating
+        if (enemyDrops != null)
+        {
+            enemyDrops.DropCommons();
+        }
+        
         GameObjectPoolManager.Deactivate(gameObject);
-        // effects, sound effects, drops
-        DropCommons();
-
+        // effects, sound effects
     }
+    
     void AttemptAttack()
     {
         if (Time.time >= nextAttackTime)
@@ -151,99 +109,6 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    #region drops
-    public void DropCommons()
-    {
-        DropExp();
-        DropHealth();
-
-    }
-    private void DropExp()
-    {
-
-        GameObject drop;
-        int amountToDrop = GetNumberInRangeWithCompoundingProbability(minPotentialExpDrops, maxPotentialExpDrops, expDropProbability, reductionFactorForSubsequentExpDrops);
-        for (int i = 0; i < amountToDrop; i++)
-        {
-            drop = GetDropByQuality(expDrops);
-            BurstSpawnDrop(drop);
-        }
-    }
-    private void DropHealth()
-    {
-        GameObject drop;
-        int amountToDrop = GetNumberInRangeWithCompoundingProbability(minPotentialHealthDrops, maxPotentialHealthDrops, healthDropProbability, reductionFactorForSubsequentHealthDrops);
-        for (int i = 0; i < amountToDrop; i++)
-        {
-            drop = GetDropByQuality(healthDrops);
-            BurstSpawnDrop(drop);
-        }
-    }
-    private int GetNumberInRangeWithCompoundingProbability(int min, int max, float probability, float probabilityReductionFactor)
-    {
-
-        int result = min;
-        if (max - min >= 1)
-        {
-            float p = probability;
-            while (result < max)
-            {
-                if (Random.Range(0f, 1f) > p)
-                {
-                    break;
-                }
-                p /= probabilityReductionFactor;
-                result += 1;
-            }
-        }
-        return result;
-
-    }
-    private GameObject GetDropByQuality(GameObject[] drops)
-    {
-        /*
-        int quality = dropQuality;
-        if (probabilityForBetterDrop > 0f)
-        {
-            float p = probabilityForBetterDrop;
-            for (int i = 1; i <= maxDropsSelectionAmount - dropQuality; i++)
-            {
-                if (Random.Range(0f, 1f) > p)
-                {
-                    break;
-                }
-
-                p /= reductionFactorForIncreasinglyBetterDrop;
-                quality += 1;
-                i += 1;
-            }
-        }
-        quality = Mathf.Clamp(quality, 0, drops.Length - 1);
-        return drops[quality];
-        */
-        return drops[GetNumberInRangeWithCompoundingProbability(dropQuality, maxDropsSelectionAmount - 1, probabilityForBetterDrop, reductionFactorForIncreasinglyBetterDrop)];
-    }
-    private void BurstSpawnDrop(GameObject drop)
-    {
-        GameObject currSpawned = GameObjectPoolManager.SpawnObject(drop,
-            transform.position,
-            Quaternion.identity);
-        Rigidbody rb = currSpawned.GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            // Add random upward direction to make pickups fly out
-            Vector3 randomDirection = new Vector3(
-                Random.Range(dropBurstVectorLowerBounds.x, dropBurstVectorUpperBounds.x),
-                Random.Range(dropBurstVectorLowerBounds.y, dropBurstVectorUpperBounds.x),
-                Random.Range(dropBurstVectorLowerBounds.z, dropBurstVectorUpperBounds.x)
-            ).normalized;
-            rb.isKinematic = false;
-            currSpawned.GetComponent<SphereCollider>().enabled = true;
-            rb.AddForce(randomDirection * dropExplosionForce, ForceMode.Impulse);
-        }
-    }
-
-    #endregion
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
