@@ -14,16 +14,22 @@ public class PlayerUpgrades : MonoBehaviour
     [Tooltip("Reference to the upgrade selection UI panel")]
     public UpgradeSelectionUI upgradeSelectionUI;
 
-    [Tooltip("Time scale when upgrade selection UI is open")]
+    [Tooltip("Time scale when upgrade selection UI is open. Warning: a value of 0 may cause issues")]
+    [Range(0f, 1f)]
     public float upgradeSelectionTimeScale = 0.05f;
 
     [Tooltip("Whether to use the UpgradeDatabase for upgrades")]
     public bool useUpgradeDatabase = true;
-    
+
     [Tooltip("Whether to use level-based weighted quality selection")]
     public bool useWeightedQualitySelection = true;
 
+    [Header("Script Management")]
+    [Tooltip("Scripts to disable during upgrade selection")]
+    public MonoBehaviour[] scriptsToDisable;
+
     private PlayerStats playerStats;
+    private List<MonoBehaviour> disabledScripts = new List<MonoBehaviour>();
 
     private void Start()
     {
@@ -32,7 +38,7 @@ public class PlayerUpgrades : MonoBehaviour
         {
             Debug.LogError("PlayerStats component is missing!");
         }
-        
+
         // Load upgrades from database if using the database and the list is empty
         if (useUpgradeDatabase && possibleUpgrades.Count == 0)
         {
@@ -49,11 +55,44 @@ public class PlayerUpgrades : MonoBehaviour
 
     public void HandleLevelUp()
     {
+        // Disable scripts during upgrade selection (most likely just movement and camera)
+        DisablePlayerScripts();
         // Show upgrade selection UI
         PresentUpgradeOptions();
 
-        // Pause game
+        // Pause/ slow game 
         Time.timeScale = upgradeSelectionTimeScale;
+    }
+    private void DisablePlayerScripts()
+    {
+        disabledScripts.Clear();
+
+        if (scriptsToDisable != null)
+        {
+            foreach (MonoBehaviour script in scriptsToDisable)
+            {
+                if (script != null && script.enabled)
+                {
+                    script.enabled = false;
+                    disabledScripts.Add(script);
+                    Debug.Log($"Disabled script: {script.GetType().Name}");
+                }
+            }
+        }
+    }
+
+    private void ReenablePlayerScripts()
+    {
+        foreach (MonoBehaviour script in disabledScripts)
+        {
+            if (script != null)
+            {
+                script.enabled = true;
+                Debug.Log($"Re-enabled script: {script.GetType().Name}");
+            }
+        }
+
+        disabledScripts.Clear();
     }
 
     private void PresentUpgradeOptions()
@@ -88,7 +127,7 @@ public class PlayerUpgrades : MonoBehaviour
                 return UpgradeDatabase.Instance.GetRandomUpgrades(count);
             }
         }
-        
+
         // Otherwise use the local list
         List<Upgrade> availableUpgrades = new List<Upgrade>(possibleUpgrades);
         List<Upgrade> selectedUpgrades = new List<Upgrade>();
@@ -113,10 +152,10 @@ public class PlayerUpgrades : MonoBehaviour
 
     public void OnUpgradeSelected(Upgrade selectedUpgrade)
     {
-        string upgradeName = selectedUpgrade.useQualitySystem 
-            ? $"{selectedUpgrade.quality} {selectedUpgrade.upgradeName}" 
+        string upgradeName = selectedUpgrade.useQualitySystem
+            ? $"{selectedUpgrade.quality} {selectedUpgrade.upgradeName}"
             : selectedUpgrade.upgradeName;
-            
+
         Debug.Log($"OnUpgradeSelected called with: {upgradeName}");
 
         // Apply the selected upgrade
@@ -127,6 +166,9 @@ public class PlayerUpgrades : MonoBehaviour
 
         // Hide panel
         upgradeSelectionUI.gameObject.SetActive(false);
+
+        // Re-enable player scripts
+        ReenablePlayerScripts();
     }
 
     private void ApplyUpgrade(Upgrade upgrade)
@@ -139,7 +181,7 @@ public class PlayerUpgrades : MonoBehaviour
 
         // Calculate adjusted value based on quality
         float adjustedValue = upgrade.GetAdjustedValue();
-        
+
         // Apply the appropriate stat boost based on upgrade type
         switch (upgrade.type)
         {
