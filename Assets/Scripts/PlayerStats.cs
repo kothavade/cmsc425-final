@@ -163,7 +163,7 @@ public class PlayerStats : MonoBehaviour
     public void LevelUp()
     {
         Level += 1;
-        ExpToLevel = (int)(expRequirementIncreaseFactor * Level);
+        ExpToLevel = (int)(expRequirementIncreaseFactor * ExpToLevel);
 
         // Show upgrade selection UI
         PresentUpgradeOptions();

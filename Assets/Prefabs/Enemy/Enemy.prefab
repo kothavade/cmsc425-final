@@ -175,17 +175,17 @@ MonoBehaviour:
   - {fileID: 2504506660737205666, guid: cefa3a5921f1a304aa6b4a737801a805, type: 3}
   - {fileID: 2504506660737205666, guid: b567366a62600c944af77d9bbf600c1f, type: 3}
   healthDropProbability: 0.5
-  reductionFactorForSubsequentHealthDrops: 2
+  reductionFactorForSubsequentHealthDrops: 1.5
   maxPotentialHealthDrops: 3
   minPotentialHealthDrops: 0
-  numberOfExpDrops: 3
+  numberOfExpDrops: 5
   maxDropsSelectionAmount: 3
   dropQuality: 0
   probabilityForBetterDrop: 0.1
   reductionFactorForIncreasinglyBetterDrop: 10
   dropExplosionForce: 0.6
   dropBurstVectorLowerBounds: {x: -0.5, y: 1, z: -0.5}
-  dropBurstVectorUpperBounds: {x: 0.5, y: 10, z: 0.5}
+  dropBurstVectorUpperBounds: {x: 0.5, y: 4, z: 0.5}
   drops: []
 --- !u!195 &261296932872062096
 NavMeshAgent:

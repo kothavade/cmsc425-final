@@ -2435,11 +2435,6 @@ Transform:
   - {fileID: 1420520542}
   m_Father: {fileID: 1575601345}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1834654141 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5524291035802306079, guid: c17ebbd68c77017499db6ec7da45bef1, type: 3}
-  m_PrefabInstance: {fileID: 1059675769416960615}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1876112449 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 296648656598057331, guid: e009f7c232c53d14a84c86370ab2dcc8, type: 3}
@@ -2601,7 +2596,7 @@ PrefabInstance:
     - target: {fileID: 5830773116378290050, guid: c17ebbd68c77017499db6ec7da45bef1, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1834654141}
+      objectReference: {fileID: 0}
     - target: {fileID: 5830773116378290050, guid: c17ebbd68c77017499db6ec7da45bef1, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -2759,7 +2754,12 @@ PrefabInstance:
       value: -323.3333
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 3294902806120428431, guid: c17ebbd68c77017499db6ec7da45bef1, type: 3}
+    - {fileID: 6795497176012571634, guid: c17ebbd68c77017499db6ec7da45bef1, type: 3}
+    - {fileID: 6091048426797478227, guid: c17ebbd68c77017499db6ec7da45bef1, type: 3}
+    - {fileID: 1039054847758505814, guid: c17ebbd68c77017499db6ec7da45bef1, type: 3}
+    - {fileID: 5524291035802306079, guid: c17ebbd68c77017499db6ec7da45bef1, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4061943494572550712, guid: c17ebbd68c77017499db6ec7da45bef1, type: 3}
@@ -2912,7 +2912,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3183873948012795669, guid: e009f7c232c53d14a84c86370ab2dcc8, type: 3}
       propertyPath: ExpToLevel
-      value: 10
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 3183873948012795669, guid: e009f7c232c53d14a84c86370ab2dcc8, type: 3}
       propertyPath: ExpPickupRange
@@ -2937,6 +2937,10 @@ PrefabInstance:
     - target: {fileID: 3183873948012795669, guid: e009f7c232c53d14a84c86370ab2dcc8, type: 3}
       propertyPath: possibleUpgrades.Array.size
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3183873948012795669, guid: e009f7c232c53d14a84c86370ab2dcc8, type: 3}
+      propertyPath: expRequirementIncreaseFactor
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 3183873948012795669, guid: e009f7c232c53d14a84c86370ab2dcc8, type: 3}
       propertyPath: possibleUpgrades.Array.data[0].icon
@@ -3032,7 +3036,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3183873948012795669, guid: e009f7c232c53d14a84c86370ab2dcc8, type: 3}
       propertyPath: possibleUpgrades.Array.data[3].description
-      value: Increases strength by x
+      value: Increases defense by x
       objectReference: {fileID: 0}
     - target: {fileID: 3183873948012795669, guid: e009f7c232c53d14a84c86370ab2dcc8, type: 3}
       propertyPath: possibleUpgrades.Array.data[3].upgradeName
