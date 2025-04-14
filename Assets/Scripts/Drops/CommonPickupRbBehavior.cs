@@ -1,11 +1,14 @@
 using UnityEngine;
 
-public class ExpRbBehavior : MonoBehaviour
+public class CommonPickupRbBehavior : MonoBehaviour
 {
 
     public Rigidbody rb;
     public LayerMask groundMask;
     public float groundDistance = 1f;
+
+    // Should probably also add a timer to this, disable rb after 1 second or something
+    // also possibly more efficient option of removing or disabling component instead of just making kinematic
     void OnTriggerStay(Collider other)
     {
         Debug.Log("Exp collider triggered");
